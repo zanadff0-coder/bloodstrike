@@ -19,18 +19,19 @@ jobs:
 
     - name: Install Android NDK r21e
       run: |
-        wget https://google.com
+        wget -q https://google.com
         unzip -q android-ndk-r21e-linux-x86_64.zip
         echo "ANDROID_NDK_HOME=$GITHUB_WORKSPACE/android-ndk-r21e" >> $GITHUB_ENV
 
-    - name: Unzip Source Code
+    - name: Unzip and Fix JNI Path
       run: |
         unzip -q "bloodstrike src 013 (1).zip"
-        JNI_DIR=$(find . -type d -name "jni" | head -n 1)
-        if [ -z "$JNI_DIR" ]; then
-          echo "Error: jni folder not found!"
+        MK_FILE=$(find . -name "Android.mk" | head -n 1)
+        if [ -z "$MK_FILE" ]; then
+          echo "Error: Android.mk not found!"
           exit 1
         fi
+        JNI_DIR=$(dirname "$MK_FILE")
         echo "PROJ_DIR=$(dirname "$JNI_DIR")" >> $GITHUB_ENV
 
     - name: Compile C++ Code with ndk-build
